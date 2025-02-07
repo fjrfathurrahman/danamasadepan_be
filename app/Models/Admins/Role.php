@@ -10,7 +10,7 @@ class Role extends Model
     protected $fillable = ['name'];
 
     // Relationship to Table Admin
-    public function Admin()
+    public function admin()
     {
         return $this->hasMany(Admin::class);
     }
