@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('photo')->nullable();
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
-            $table->bigInteger('balance')->default(0);
+            $table->decimal('balance', 10, 2)->default(0);
             $table->boolean('allowed')->default(false);
             $table->timestamps();
         });

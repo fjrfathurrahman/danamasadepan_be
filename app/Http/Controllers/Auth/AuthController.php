@@ -52,10 +52,15 @@ class AuthController extends Controller
 
             // Login sebagai Student
             if ($student && Hash::check($validated['password'], $student->password)) {
+
+                if($student->allowed == false) {
+                    return ResponseResource::error('Akun Belum Diizinkan');
+                }
+
                 $studentModel = Student::find($student->id); // Menemukan student berdasarkan ID
                 $token = $studentModel->createToken('StudentToken')->plainTextToken;
 
-                return ResponseResource::success('Login Berhasil', [ 'token' => $token, 'role' => 'student', 'user' => $student]);
+                return ResponseResource::success('Login Berhasil', ['token' => $token, 'role' => 'student', 'user' => $student]);
             }
 
             return ResponseResource::error('Email atau Password Tidak Sesuai');
@@ -89,39 +94,48 @@ class AuthController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \App\Http\Resources\ResponseResource
      */
-    public function registerStudent(Request $request): ResponseResource
+    public function registerStudent(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), ([
-                'name' => 'required|string',
+            // Mulai transaksi database
+            DB::beginTransaction();
+
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:students,email',
-                'password' => 'required|min:6',
-                'class' => 'required|string',
-                'major' => 'required|string',
-                'gender' => 'required|string',
-                'photo' => 'required|image|mimes:jpeg,png,jpg,gif',
-            ]));
+                'password' => 'required|string|min:6',
+                'class' => 'required|in:X,XI,XII', 
+                'major' => 'required|string|max:255',
+                'gender' => 'required|in:Laki-laki,Perempuan',
+                'phone' => 'required|string',
+                'address' => 'required|string',
+                'photo' => 'nullable|image',
+            ]);
 
             if ($validator->fails()) {
                 return ResponseResource::error($validator->errors());
-            };
+            }
 
-            $validated = $validator->validate();
+            // Ambil data yang sudah divalidasi
+            $validated = $validator->validated();
             $validated['password'] = Hash::make($validated['password']);
 
             if ($request->hasFile('photo')) {
-                $validated['photo'] = $request->file('photo')->store('student_photos', 'public');
+                $photoName = time() . '_' . $request->file('photo')->getClientOriginalName();
+                $validated['photo'] = $request->file('photo')->storeAs('student_photos', $photoName, 'public');
             }
 
             $student = Student::create($validated);
 
-            // Commit transaksi jika semua sukses
+            // Commit transaksi jika sukses
             DB::commit();
 
-            return ResponseResource::success( 'Siswa Berhasil Didaftarkan', $student);
+            return ResponseResource::success('Siswa Berhasil Didaftarkan', $student);
         } catch (\Throwable $th) {
+
+            // Rollback jika terjadi error
             DB::rollBack();
-            return ResponseResource::error($th->getMessage());
+            return ResponseResource::error( $th->getMessage());
         }
     }
 }

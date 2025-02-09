@@ -20,10 +20,29 @@ class StudentController extends Controller
             if ($students->isEmpty()) {
                 return ResponseResource::notFound();
             }
-
-            return ResponseResource::success('Data Berhasil Ditemukan', $students);
+    
+            $formattedStudents = $students->map(function ($student) {
+                return [
+                    'id' => $student->id,
+                    'name' => $student->name,
+                    'email' => $student->email,
+                    'gender' => $student->gender,
+                    'class' => $student->class,
+                    'major' => $student->major,
+                    'phone' => $student->phone,
+                    'address' => $student->address,
+                    'photo' => $student->photo,
+                    'balance' => number_format($student->balance, 0, ',', '.'),
+                    'allowed' => $student->allowed,
+                    'created_at' => $student->created_at->toIso8601String(),
+                    'updated_at' => $student->updated_at->toIso8601String()
+                ];
+            });
+    
+            return ResponseResource::success('Data Berhasil Ditemukan', $formattedStudents);
         } catch (\Throwable $th) {
             return ResponseResource::error($th->getMessage());
         }
     }
+
 }
