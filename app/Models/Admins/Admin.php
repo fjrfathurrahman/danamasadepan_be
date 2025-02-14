@@ -4,33 +4,35 @@ namespace App\Models\Admins;
 
 use App\Models\Students\Student;
 use App\Models\Transaction\Transactions;
+use App\Models\Admins\Role;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class Admin extends Model
+class Admin extends Authenticatable
 {
-    use HasApiTokens, HasFactory;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = 'admins';
     protected $fillable = ['name', 'email', 'password', 'role_id', 'photo'];
 
-
-    // Relationship to Table Role
+    // Relationship ke Role
     public function role()
     {
         return $this->belongsTo(Role::class);
     }
 
-    // Relationship to Table Transaction
+    // Relationship ke Transactions
     public function transactions()
     {
         return $this->hasMany(Transactions::class);
     }
 
-    // Relationship to Table Student
+    // Relationship ke Students
     public function students()
     {
         return $this->hasMany(Student::class);
     }
 }
+

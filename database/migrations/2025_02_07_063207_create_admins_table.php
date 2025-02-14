@@ -16,11 +16,12 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->unsignedBigInteger('role_id');
+            $table->foreignId('role_id')->constrained('roles')->onDelete('cascade'); // 🛠 Foreign Key Fix
             $table->string('photo')->nullable();
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

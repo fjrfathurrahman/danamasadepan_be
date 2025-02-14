@@ -28,11 +28,19 @@ class Transactions extends Model
         return $this->belongsTo(Admin::class);
     }
 
-    // Custom Attribute Balance
-    protected function amount(): Attribute
-    {
-        return Attribute::make(
-            get: fn($value) => number_format($value, 0, ',', '.')
-        );
-    }
+    /**
+     * Get formatted balance
+     * 
+     * @return string
+     */
+    // public function getBalanceAttribute($value)
+    // {
+    //     return number_format($value, 0, ',', '.');
+    // }
+
+    // public function getFormattedBalanceAttribute()
+    // {
+    //     return number_format($this->balance, 0, ',', '.');
+    // }
+
 }

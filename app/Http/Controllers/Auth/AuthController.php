@@ -7,9 +7,11 @@ use App\Http\Resources\ResponseResource;
 use App\Models\Admins\Admin;
 use App\Models\Students\Student;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+
 
 class AuthController extends Controller
 {
@@ -53,7 +55,7 @@ class AuthController extends Controller
             // Login sebagai Student
             if ($student && Hash::check($validated['password'], $student->password)) {
 
-                if($student->allowed == false) {
+                if ($student->allowed == false) {
                     return ResponseResource::error('Akun Belum Diizinkan');
                 }
 
@@ -79,7 +81,7 @@ class AuthController extends Controller
     public function logout(Request $request): ResponseResource
     {
         try {
-            $request->user()->currentAccessToken()->delete();
+            $request->user()->tokens()->delete();
 
             return ResponseResource::success('Logout Berhasil', null);
         } catch (\Throwable $th) {
@@ -104,7 +106,7 @@ class AuthController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:students,email',
                 'password' => 'required|string|min:6',
-                'class' => 'required|in:X,XI,XII', 
+                'class' => 'required|in:X,XI,XII',
                 'major' => 'required|string|max:255',
                 'gender' => 'required|in:Laki-laki,Perempuan',
                 'phone' => 'required|string',
@@ -135,7 +137,35 @@ class AuthController extends Controller
 
             // Rollback jika terjadi error
             DB::rollBack();
-            return ResponseResource::error( $th->getMessage());
+            return ResponseResource::error($th->getMessage());
+        }
+    }
+
+    public function resetPassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'old_password' => 'required',
+                'new_password' => 'required|min:8',
+            ]);
+
+            /**
+             * Dapatkan user yang sedang login
+             * @var \App\Models\User $user
+             */
+            $user = Auth::user();
+
+            // Cek apakah password lama sesuai
+            if (!Hash::check($request->old_password, $user->password)) {
+                return ResponseResource::error('Password Lama Tidak Sesuai');
+            }
+
+            $user->password = Hash::make($request->new_password);
+            $user->save();
+
+            return ResponseResource::success('Password Berhasil Diubah');
+        } catch (\Throwable $th) {
+            return ResponseResource::error($th->getMessage());
         }
     }
 }

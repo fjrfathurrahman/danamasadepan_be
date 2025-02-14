@@ -6,7 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Request;
 
-class ResponseResource  extends JsonResource
+class ResponseResource extends JsonResource
 {
     private int $status;
     private string $message;
@@ -37,7 +37,8 @@ class ResponseResource  extends JsonResource
         return [
             'status' => $this->status,
             'message' => $this->message,
-            'result' => $this->whenNotNull($this->data)
+            // Jika status >= 400, gunakan "errors", selain itu gunakan "result"
+            $this->status >= 400 ? 'errors' : 'result' => $this->whenNotNull($this->data)
         ];
     }
 
@@ -87,3 +88,4 @@ class ResponseResource  extends JsonResource
         return new static([$status, $message, null]);
     }
 }
+

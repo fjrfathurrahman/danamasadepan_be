@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained()->onDelete('cascade'); 
-            $table->foreignId('admin_id')->constrained()->onDelete('cascade');   
-            $table->enum('type', ['debit', 'kredit']);                     
-            $table->decimal('amount', 10, 2);                                   
+            $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
+            $table->foreignId('admin_id')->constrained('admins')->onDelete('cascade'); // 🛠 Foreign Key Fix
+            $table->enum('type', ['debit', 'kredit']);
+            $table->decimal('amount', 10, 2);
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
