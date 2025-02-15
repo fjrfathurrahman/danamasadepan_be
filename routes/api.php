@@ -24,10 +24,10 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
 
 // * Route Role
 Route::prefix('role')->controller(RoleController::class)->group(function () {
-    Route::get('/', 'index')->middleware('auth:sanctum');
-    Route::post('add', 'store')->middleware('auth:sanctum');
-    Route::delete('delete/{id}', 'destroy')->middleware('auth:sanctum');
-});
+    Route::get('/', 'index');
+    Route::post('add', 'store');
+    Route::delete('delete/{id}', 'destroy');
+})->middleware('auth:sanctum');
 
 // * Route Admin
 Route::prefix('admin')->controller(AdminController::class)->group(function () {
@@ -37,7 +37,6 @@ Route::prefix('admin')->controller(AdminController::class)->group(function () {
     Route::post('add', 'store');
     Route::put('update/{id}', 'update')->middleware('auth:sanctum');
     Route::put('update/{id}/status', 'updateAllowed')->middleware('auth:sanctum');
-    // Route::put('update/status', 'updateAllowed')->middleware('auth:sanctum');
     Route::delete('delete/{id}', 'destroy')->middleware('auth:sanctum');
 });
 

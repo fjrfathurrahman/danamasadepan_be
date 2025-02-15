@@ -214,7 +214,6 @@ class AdminController extends Controller
     }
 
     // Tambahkan function baru di AdminController untuk toggle status allowed student
-
     public function updateAllowed(Request $request, $id)
     {
         try {

@@ -14,7 +14,6 @@ class StudentController extends Controller
 {
     /**
      * * Mengambil semua data siswa.
-     * 
      */
     public function index(): ResponseResource
     {
@@ -38,8 +37,8 @@ class StudentController extends Controller
                     'photo' => $student->photo,
                     'balance' => number_format($student->balance, 0, ',', '.'),
                     'allowed' => $student->allowed,
-                    'created_at' => $student->created_at->toIso8601String(),
-                    'updated_at' => $student->updated_at->toIso8601String()
+                    'created_at' => $student->created_at,
+                    'updated_at' => $student->updated_at
                 ];
             });
 
@@ -51,8 +50,6 @@ class StudentController extends Controller
 
     /**
      * * Function untuk mengambil data student berdasarkan id
-     *
-     * @return \App\Http\Resources\ResponseResource
      */
     public function show(Request $request, $id)
     {
@@ -75,11 +72,8 @@ class StudentController extends Controller
 
     /**
      * * Function untuk memperbarui data siswa berdasarkan id.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \App\Http\Resources\ResponseResource
      */
+     //REVIEW - UPDATE SISWA
     public function update(Request $request, $id): ResponseResource
     {
         try {
@@ -107,8 +101,29 @@ class StudentController extends Controller
             if ($request->filled('name')) {
                 $dataToUpdate['name'] = $request->name;
             }
+
             if ($request->filled('email')) {
                 $dataToUpdate['email'] = $request->email;
+            }
+
+            if ($request->filled('phone')) {
+                $dataToUpdate['phone'] = $request->phone;
+            }
+
+            if ($request->filled('address')) {
+                $dataToUpdate['address'] = $request->address;
+            }
+
+            if ($request->filled('major')) {
+                $dataToUpdate['major'] = $request->major;
+            }
+
+            if ($request->filled('class')) {
+                $dataToUpdate['class'] = $request->class;
+            }
+
+            if ($request->filled('gender')) {
+                $dataToUpdate['gender'] = $request->gender;
             }
 
             // Jika ada file photo yang diunggah
@@ -123,7 +138,7 @@ class StudentController extends Controller
                     }
 
                     // Simpan foto baru dan dapatkan path-nya
-                    $path = $file->store('student', 'public');
+                    $path = $file->store('student_photos', 'public');
                     if ($path) {
                         $dataToUpdate['photo'] = $path;
                     }
